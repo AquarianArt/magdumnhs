@@ -669,7 +669,7 @@
       statusBox.className = 'form-status';
       statusBox.style.display = 'none';
 
-      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('https://script.google.com/macros/s/AKfycbzYOP2vvDBa_iLgXsvT_b9BF6NUd8HN3OyjGvGhaUWLRwXUYjiDKUNpQ-gkya6S1q86/exec')) {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('https://script.google.com/macros/s/') !== 0) {
         statusBox.textContent = 'This form is not connected yet — the site owner still needs to add the Apps Script Web App URL.';
         statusBox.classList.add('error');
         statusBox.style.display = 'block';
