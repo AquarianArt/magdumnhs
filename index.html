@@ -658,6 +658,45 @@
     });
   }
 
+  // ---- Transport: hidden iframe + postMessage ----
+  // fetch()/XHR to Apps Script Web Apps is unreliable across Google's infrastructure —
+  // real cross-origin CORS headers on the POST response aren't consistently sent.
+  // A real <form> submission into a hidden iframe is a browser *navigation*, which is
+  // never subject to CORS. The Apps Script side replies with a tiny HTML page that
+  // calls parent.postMessage(...) to hand the result back to us — postMessage is
+  // explicitly designed to work across origins, unlike fetch.
+  let pendingSubmission = null; // { statusBox, submitBtn, originalLabel, formName, form }
+
+  const bridgeFrame = document.createElement('iframe');
+  bridgeFrame.name = 'mnhs-submit-bridge';
+  bridgeFrame.style.display = 'none';
+  document.body.appendChild(bridgeFrame);
+
+  window.addEventListener('message', function(event){
+    if (!pendingSubmission) return;
+    let result = event.data;
+    if (typeof result === 'string') {
+      try { result = JSON.parse(result); } catch (e) { return; }
+    }
+    if (!result || typeof result.success === 'undefined') return; // not our message
+
+    const { statusBox, submitBtn, originalLabel, formName, form } = pendingSubmission;
+    clearTimeout(pendingSubmission.timeoutId);
+
+    if (result.success) {
+      statusBox.textContent = 'Thank you! Your ' + formName.toLowerCase() + ' has been sent to the registrar. Please watch your email for a confirmation.';
+      statusBox.classList.add('success');
+      form.reset();
+    } else {
+      statusBox.textContent = result.error || 'Your submission could not be processed. Please check your files and try again.';
+      statusBox.classList.add('error');
+    }
+    statusBox.style.display = 'block';
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalLabel;
+    pendingSubmission = null;
+  });
+
   document.querySelectorAll('.app-form').forEach(function(form){
     form.addEventListener('submit', function(e){
       e.preventDefault();
@@ -717,51 +756,44 @@
       }))
       .then(function(files){
         const payload = { formName: formName, fields: fields, files: files };
-        // text/plain avoids a CORS preflight, which Apps Script Web Apps don't handle.
-        return fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-      })
-      .then(function(res){
-        return res.text().then(function(text){
-          return { status: res.status, ok: res.ok, text: text };
-        });
-      })
-      .then(function(resInfo){
-        let result;
-        try {
-          result = JSON.parse(resInfo.text);
-        } catch (parseErr) {
-          console.error('Non-JSON response from Apps Script (HTTP ' + resInfo.status + '):', resInfo.text.slice(0, 500));
-          const hint = resInfo.text.indexOf('accounts.google.com') !== -1 || resInfo.text.indexOf('ServiceLogin') !== -1
-            ? ' This looks like a Google sign-in page — your Web App deployment access is probably not set to "Anyone".'
-            : ' Check that the Apps Script URL is the /exec deployment URL (not /dev), and that it has been deployed after your latest code changes.';
-          throw new Error('The form backend did not respond correctly (HTTP ' + resInfo.status + ').' + hint);
-        }
-        return result;
-      })
-      .then(function(result){
-        if (result.success) {
-          statusBox.textContent = 'Thank you! Your ' + formName.toLowerCase() + ' has been sent to the registrar. Please watch your email for a confirmation.';
-          statusBox.classList.add('success');
-          form.reset();
-        } else {
-          statusBox.textContent = result.error || 'Your submission could not be processed. Please check your files and try again.';
-          statusBox.classList.add('error');
-        }
-        statusBox.style.display = 'block';
+
+        // Build a throwaway form that posts into the hidden iframe (a real navigation,
+        // so it is never subject to CORS). The whole JSON payload rides in one hidden field.
+        const bridgeForm = document.createElement('form');
+        bridgeForm.method = 'POST';
+        bridgeForm.action = APPS_SCRIPT_URL;
+        bridgeForm.target = 'mnhs-submit-bridge';
+        bridgeForm.style.display = 'none';
+
+        const payloadInput = document.createElement('input');
+        payloadInput.type = 'hidden';
+        payloadInput.name = 'payload';
+        payloadInput.value = JSON.stringify(payload);
+        bridgeForm.appendChild(payloadInput);
+
+        document.body.appendChild(bridgeForm);
+
+        const timeoutId = setTimeout(function(){
+          if (pendingSubmission && pendingSubmission.form === form) {
+            statusBox.textContent = 'The registrar\'s server took too long to respond. Please check your connection and try again.';
+            statusBox.classList.add('error');
+            statusBox.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalLabel;
+            pendingSubmission = null;
+          }
+        }, 25000);
+
+        pendingSubmission = { statusBox, submitBtn, originalLabel, formName, form, timeoutId };
+
+        bridgeForm.submit();
+        bridgeForm.remove();
       })
       .catch(function(err){
         console.error(err);
-        statusBox.textContent = (err && err.message)
-          ? err.message
-          : 'Something went wrong sending this form. Please try again, or email the registrar directly.';
+        statusBox.textContent = 'Something went wrong preparing your attachments. Please try again.';
         statusBox.classList.add('error');
         statusBox.style.display = 'block';
-      })
-      .finally(function(){
         submitBtn.disabled = false;
         submitBtn.textContent = originalLabel;
       });
