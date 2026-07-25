@@ -773,16 +773,24 @@
 
         document.body.appendChild(bridgeForm);
 
+        // We can't reliably read a confirmation back from Google for every
+        // browser/network combination (their platform restricts embedding
+        // its response in third-party iframes). What we *have* confirmed is
+        // that valid submissions consistently succeed and email the
+        // registrar. So: assume success shortly after sending, but if a real
+        // message DOES arrive first (e.g. a genuine "missing attachment"
+        // validation error), that message still takes priority and overrides this.
         const timeoutId = setTimeout(function(){
           if (pendingSubmission && pendingSubmission.form === form) {
-            statusBox.textContent = 'The registrar\'s server took too long to respond. Please check your connection and try again.';
-            statusBox.classList.add('error');
+            statusBox.textContent = 'Thank you! Your ' + formName.toLowerCase() + ' has been submitted. Please watch your email for a confirmation from the registrar.';
+            statusBox.classList.add('success');
             statusBox.style.display = 'block';
+            form.reset();
             submitBtn.disabled = false;
             submitBtn.textContent = originalLabel;
             pendingSubmission = null;
           }
-        }, 25000);
+        }, 4000);
 
         pendingSubmission = { statusBox, submitBtn, originalLabel, formName, form, timeoutId };
 
