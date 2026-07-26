@@ -248,6 +248,25 @@
   .qr-label{font-size:13.5px; font-weight:700; color:var(--royal-deep);}
   .qr-account{font-size:12.5px; color:#3f4358; margin-top:3px;}
   .qr-note{font-size:11.5px; color:#8a6d00; margin-top:6px; font-style:italic; line-height:1.4;}
+  .consent-block{
+    border:1px solid var(--line); background:#f7f8fb; border-radius:10px;
+    padding:14px 16px; margin:18px 0 14px;
+  }
+  .consent-block summary{
+    font-size:13px; font-weight:700; color:var(--royal-deep); cursor:pointer; list-style:none;
+  }
+  .consent-block summary::-webkit-details-marker{display:none;}
+  .consent-block summary::before{content:"🔒 "; }
+  .consent-block summary::after{content:" (click to read)"; font-weight:400; color:#7a7f95; font-size:11.5px;}
+  .consent-block[open] summary::after{content:" (click to collapse)";}
+  .consent-notice-text{font-size:12.5px; color:#4d5169; line-height:1.65; margin-top:10px;}
+  .consent-notice-text p{margin:0 0 8px;}
+  .consent-check{
+    display:flex; align-items:flex-start; gap:9px; margin-top:12px;
+    padding-top:12px; border-top:1px dashed var(--line);
+  }
+  .consent-check input{width:16px; height:16px; margin-top:2px; flex-shrink:0; accent-color:var(--royal);}
+  .consent-check label{font-size:12.5px; color:var(--ink); line-height:1.5; font-weight:500;}
   .radio-group label{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--ink); font-weight:500;}
 
   /* ---------- RESPONSIVE ---------- */
@@ -501,6 +520,17 @@
             <div class="field"><label>Additional Notes (optional)</label><textarea name="Notes"></textarea></div>
           </div>
         </fieldset>
+        <details class="consent-block">
+          <summary>Data Privacy Notice</summary>
+          <div class="consent-notice-text">
+            <p>Magdum National High School collects the information and attachments in this form solely to process your enrollment application. Access is limited to authorized school personnel handling registration.</p>
+            <p>Your data is retained only as long as needed for enrollment and record-keeping purposes, in accordance with Republic Act No. 10173 (the Data Privacy Act of 2012). You may contact the registrar's office to access, correct, or request deletion of your information.</p>
+          </div>
+          <div class="consent-check">
+            <input type="checkbox" id="consent-registration" name="Data Privacy Consent" value="I Agree" required>
+            <label for="consent-registration">I have read the Data Privacy Notice and consent to the collection and processing of my (or my child's) personal data for this enrollment application.</label>
+          </div>
+        </details>
         <button type="submit" class="submit-btn">Submit Registration</button>
         <div class="form-status"></div>
       </form>
@@ -603,6 +633,17 @@
         <div class="form-row single">
           <div class="field"><label>Email Address (for confirmation)</label><input type="email" name="Email" required></div>
         </div>
+        <details class="consent-block">
+          <summary>Data Privacy Notice</summary>
+          <div class="consent-notice-text">
+            <p>Magdum National High School collects the information in this form solely to record and verify your PTA contribution. Access is limited to authorized school and PTA personnel handling PTA records.</p>
+            <p>Your data is retained only as long as needed for PTA record-keeping, in accordance with Republic Act No. 10173 (the Data Privacy Act of 2012). You may contact the registrar's office to access, correct, or request deletion of your information.</p>
+          </div>
+          <div class="consent-check">
+            <input type="checkbox" id="consent-pta" name="Data Privacy Consent" value="I Agree" required>
+            <label for="consent-pta">I have read the Data Privacy Notice and consent to the collection and processing of my personal data for this PTA payment record.</label>
+          </div>
+        </details>
         <button type="submit" class="submit-btn">Submit Payment Notice</button>
         <div class="form-status"></div>
       </form>
@@ -654,6 +695,17 @@
             <div class="field"><label>Current School Request</label><input type="file" name="Attachment - Current School Request" accept="image/*" required></div>
           </div>
         </fieldset>
+        <details class="consent-block">
+          <summary>Data Privacy Notice</summary>
+          <div class="consent-notice-text">
+            <p>Magdum National High School collects the information and attachment in this form solely to process your Form 137 request. Access is limited to authorized registrar personnel handling records requests.</p>
+            <p>Your data is retained only as long as needed to process and log this request, in accordance with Republic Act No. 10173 (the Data Privacy Act of 2012). You may contact the registrar's office to access, correct, or request deletion of your information.</p>
+          </div>
+          <div class="consent-check">
+            <input type="checkbox" id="consent-form137" name="Data Privacy Consent" value="I Agree" required>
+            <label for="consent-form137">I have read the Data Privacy Notice and consent to the collection and processing of my (or the student's) personal data for this request.</label>
+          </div>
+        </details>
         <button type="submit" class="submit-btn">Submit Request</button>
         <div class="form-status"></div>
       </form>
@@ -689,6 +741,17 @@
         <div class="form-row single">
           <div class="field"><label>Email Address (for confirmation)</label><input type="email" name="Email" required></div>
         </div>
+        <details class="consent-block">
+          <summary>Data Privacy Notice</summary>
+          <div class="consent-notice-text">
+            <p>Magdum National High School collects the information in this form solely to process your Certificate of Enrollment request. Access is limited to authorized registrar personnel handling records requests.</p>
+            <p>Your data is retained only as long as needed to process and log this request, in accordance with Republic Act No. 10173 (the Data Privacy Act of 2012). You may contact the registrar's office to access, correct, or request deletion of your information.</p>
+          </div>
+          <div class="consent-check">
+            <input type="checkbox" id="consent-coe" name="Data Privacy Consent" value="I Agree" required>
+            <label for="consent-coe">I have read the Data Privacy Notice and consent to the collection and processing of my (or the student's) personal data for this request.</label>
+          </div>
+        </details>
         <button type="submit" class="submit-btn">Submit Request</button>
         <div class="form-status"></div>
       </form>
