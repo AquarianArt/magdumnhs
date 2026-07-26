@@ -689,6 +689,28 @@
           <div class="field"><label>Email Address (for confirmation)</label><input type="email" name="Email" required></div>
         </div>
         <fieldset>
+          <legend>Requestor ID Verification</legend>
+          <p class="attach-hint">To help the registrar confirm who's requesting this record, please provide a valid ID. This will be checked against your name before the document is released.</p>
+          <div class="form-row">
+            <div class="field">
+              <label>ID Type</label>
+              <select name="ID Type" required>
+                <option value="">Select</option>
+                <option>PhilID / National ID</option>
+                <option>UMID</option>
+                <option>Postal ID</option>
+                <option>Voter's ID</option>
+                <option>Driver's License</option>
+                <option>School ID (if student requesting for self)</option>
+              </select>
+            </div>
+            <div class="field"><label>ID Number</label><input type="text" name="ID Number" required></div>
+          </div>
+          <div class="form-row single">
+            <div class="field"><label>Valid ID (Photo or Scan)</label><input type="file" name="Attachment - Valid ID" accept="image/*" required></div>
+          </div>
+        </fieldset>
+        <fieldset>
           <legend>Required Attachment</legend>
           <p class="attach-hint">Upload a clear photo or scan (image file only &mdash; JPG or PNG).</p>
           <div class="form-row single">
@@ -741,6 +763,28 @@
         <div class="form-row single">
           <div class="field"><label>Email Address (for confirmation)</label><input type="email" name="Email" required></div>
         </div>
+        <fieldset>
+          <legend>Requestor ID Verification</legend>
+          <p class="attach-hint">To help the registrar confirm who's requesting this record, please provide a valid ID. This will be checked against your name before the document is released.</p>
+          <div class="form-row">
+            <div class="field">
+              <label>ID Type</label>
+              <select name="ID Type" required>
+                <option value="">Select</option>
+                <option>PhilID / National ID</option>
+                <option>UMID</option>
+                <option>Postal ID</option>
+                <option>Voter's ID</option>
+                <option>Driver's License</option>
+                <option>School ID (if student requesting for self)</option>
+              </select>
+            </div>
+            <div class="field"><label>ID Number</label><input type="text" name="ID Number" required></div>
+          </div>
+          <div class="form-row single">
+            <div class="field"><label>Valid ID (Photo or Scan)</label><input type="file" name="Attachment - Valid ID" accept="image/*" required></div>
+          </div>
+        </fieldset>
         <details class="consent-block">
           <summary>Data Privacy Notice</summary>
           <div class="consent-notice-text">
