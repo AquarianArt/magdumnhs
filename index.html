@@ -237,6 +237,17 @@
   fieldset{border:none; padding:0; margin:0;}
   legend{font-size:13px; font-weight:700; color:var(--royal-deep); margin-bottom:8px; padding:0;}
   .radio-group{display:flex; gap:18px; flex-wrap:wrap; margin-bottom:14px;}
+  .qr-panel{
+    display:none; gap:16px; align-items:center;
+    border:1.5px dashed var(--gold); background:#fffbea;
+    border-radius:10px; padding:14px; margin-bottom:14px;
+  }
+  .qr-panel.show{display:flex;}
+  .qr-box{width:96px; height:96px; flex-shrink:0; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:#fff;}
+  .qr-box svg{width:100%; height:100%; display:block;}
+  .qr-label{font-size:13.5px; font-weight:700; color:var(--royal-deep);}
+  .qr-account{font-size:12.5px; color:#3f4358; margin-top:3px;}
+  .qr-note{font-size:11.5px; color:#8a6d00; margin-top:6px; font-style:italic; line-height:1.4;}
   .radio-group label{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--ink); font-weight:500;}
 
   /* ---------- RESPONSIVE ---------- */
@@ -479,6 +490,13 @@
           </div>
         </fieldset>
         <fieldset>
+          <legend>Additional Attachment</legend>
+          <p class="attach-hint">Image file only &mdash; JPG or PNG.</p>
+          <div class="form-row single">
+            <div class="field"><label>Reading Profile (Optional)</label><input type="file" name="Attachment - Reading Profile" accept="image/*"></div>
+          </div>
+        </fieldset>
+        <fieldset>
           <div class="form-row single">
             <div class="field"><label>Additional Notes (optional)</label><textarea name="Notes"></textarea></div>
           </div>
@@ -498,7 +516,7 @@
       <button class="modal-close" onclick="closeModal('pta')">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="note">This form notifies the PTA treasurer of a payment. If paying via GCash or bank transfer, attach or keep your reference number &mdash; you may be asked for it for verification.</div>
+      <div class="note">This form notifies the PTA treasurer of a payment. If paying via GCash or PayMaya, you can scan the QR code below, then keep your reference number &mdash; you may be asked for it for verification.</div>
       <form id="form-pta" class="app-form" data-formname="PTA Payment">
         <div class="form-row">
           <div class="field"><label>Student Full Name</label><input type="text" name="Student Full Name" required></div>
@@ -513,7 +531,69 @@
           <div class="radio-group">
             <label><input type="radio" name="Payment Method" value="Cash at office" required> Cash at office</label>
             <label><input type="radio" name="Payment Method" value="GCash"> GCash</label>
-            <label><input type="radio" name="Payment Method" value="Bank Transfer"> Bank Transfer</label>
+            <label><input type="radio" name="Payment Method" value="PayMaya"> PayMaya</label>
+          </div>
+
+          <div class="qr-panel" id="qr-gcash">
+            <div class="qr-box">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="100" height="100" fill="#fff"/>
+                <rect x="4" y="4" width="22" height="22" fill="#111"/>
+                <rect x="9" y="9" width="12" height="12" fill="#fff"/>
+                <rect x="13" y="13" width="4" height="4" fill="#111"/>
+                <rect x="74" y="4" width="22" height="22" fill="#111"/>
+                <rect x="79" y="9" width="12" height="12" fill="#fff"/>
+                <rect x="83" y="13" width="4" height="4" fill="#111"/>
+                <rect x="4" y="74" width="22" height="22" fill="#111"/>
+                <rect x="9" y="79" width="12" height="12" fill="#fff"/>
+                <rect x="13" y="83" width="4" height="4" fill="#111"/>
+                <rect x="34" y="6" width="5" height="5" fill="#111"/><rect x="44" y="6" width="5" height="5" fill="#111"/><rect x="60" y="10" width="5" height="5" fill="#111"/>
+                <rect x="34" y="16" width="5" height="5" fill="#111"/><rect x="54" y="18" width="5" height="5" fill="#111"/>
+                <rect x="6" y="34" width="5" height="5" fill="#111"/><rect x="16" y="40" width="5" height="5" fill="#111"/><rect x="6" y="50" width="5" height="5" fill="#111"/>
+                <rect x="34" y="34" width="5" height="5" fill="#111"/><rect x="44" y="38" width="5" height="5" fill="#111"/><rect x="54" y="34" width="5" height="5" fill="#111"/>
+                <rect x="34" y="44" width="5" height="5" fill="#111"/><rect x="64" y="44" width="5" height="5" fill="#111"/><rect x="44" y="54" width="5" height="5" fill="#111"/>
+                <rect x="34" y="60" width="5" height="5" fill="#111"/><rect x="54" y="64" width="5" height="5" fill="#111"/><rect x="64" y="34" width="5" height="5" fill="#111"/>
+                <rect x="74" y="34" width="5" height="5" fill="#111"/><rect x="84" y="40" width="5" height="5" fill="#111"/><rect x="74" y="50" width="5" height="5" fill="#111"/>
+                <rect x="34" y="74" width="5" height="5" fill="#111"/><rect x="44" y="84" width="5" height="5" fill="#111"/><rect x="54" y="74" width="5" height="5" fill="#111"/>
+                <rect x="64" y="74" width="5" height="5" fill="#111"/><rect x="74" y="84" width="5" height="5" fill="#111"/><rect x="84" y="74" width="5" height="5" fill="#111"/>
+              </svg>
+            </div>
+            <div class="qr-info">
+              <div class="qr-label">Scan to Pay via GCash</div>
+              <div class="qr-account">Account Name: Magdum NHS PTA (Sample)</div>
+              <div class="qr-note">Sample QR code for layout purposes &mdash; the school will replace this with the real GCash QR before going live.</div>
+            </div>
+          </div>
+
+          <div class="qr-panel" id="qr-paymaya">
+            <div class="qr-box">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="100" height="100" fill="#fff"/>
+                <rect x="4" y="4" width="22" height="22" fill="#111"/>
+                <rect x="9" y="9" width="12" height="12" fill="#fff"/>
+                <rect x="13" y="13" width="4" height="4" fill="#111"/>
+                <rect x="74" y="4" width="22" height="22" fill="#111"/>
+                <rect x="79" y="9" width="12" height="12" fill="#fff"/>
+                <rect x="83" y="13" width="4" height="4" fill="#111"/>
+                <rect x="4" y="74" width="22" height="22" fill="#111"/>
+                <rect x="9" y="79" width="12" height="12" fill="#fff"/>
+                <rect x="13" y="83" width="4" height="4" fill="#111"/>
+                <rect x="38" y="8" width="5" height="5" fill="#111"/><rect x="48" y="14" width="5" height="5" fill="#111"/><rect x="58" y="6" width="5" height="5" fill="#111"/>
+                <rect x="40" y="20" width="5" height="5" fill="#111"/><rect x="60" y="20" width="5" height="5" fill="#111"/>
+                <rect x="8" y="38" width="5" height="5" fill="#111"/><rect x="18" y="46" width="5" height="5" fill="#111"/><rect x="8" y="56" width="5" height="5" fill="#111"/>
+                <rect x="36" y="36" width="5" height="5" fill="#111"/><rect x="46" y="42" width="5" height="5" fill="#111"/><rect x="56" y="36" width="5" height="5" fill="#111"/>
+                <rect x="36" y="48" width="5" height="5" fill="#111"/><rect x="66" y="48" width="5" height="5" fill="#111"/><rect x="46" y="58" width="5" height="5" fill="#111"/>
+                <rect x="36" y="64" width="5" height="5" fill="#111"/><rect x="56" y="66" width="5" height="5" fill="#111"/><rect x="66" y="36" width="5" height="5" fill="#111"/>
+                <rect x="76" y="36" width="5" height="5" fill="#111"/><rect x="86" y="44" width="5" height="5" fill="#111"/><rect x="76" y="54" width="5" height="5" fill="#111"/>
+                <rect x="38" y="76" width="5" height="5" fill="#111"/><rect x="48" y="86" width="5" height="5" fill="#111"/><rect x="58" y="76" width="5" height="5" fill="#111"/>
+                <rect x="66" y="76" width="5" height="5" fill="#111"/><rect x="76" y="86" width="5" height="5" fill="#111"/><rect x="86" y="76" width="5" height="5" fill="#111"/>
+              </svg>
+            </div>
+            <div class="qr-info">
+              <div class="qr-label">Scan to Pay via PayMaya</div>
+              <div class="qr-account">Account Name: Magdum NHS PTA (Sample)</div>
+              <div class="qr-note">Sample QR code for layout purposes &mdash; the school will replace this with the real PayMaya QR before going live.</div>
+            </div>
           </div>
         </fieldset>
         <div class="form-row">
@@ -648,6 +728,23 @@
       document.body.style.overflow = '';
     }
   });
+
+  // Show the matching QR code panel when GCash or PayMaya is selected as the payment method.
+  (function(){
+    const ptaForm = document.getElementById('form-pta');
+    if (!ptaForm) return;
+    const qrPanels = {
+      'GCash': document.getElementById('qr-gcash'),
+      'PayMaya': document.getElementById('qr-paymaya')
+    };
+    ptaForm.querySelectorAll('input[name="Payment Method"]').forEach(function(radio){
+      radio.addEventListener('change', function(){
+        Object.keys(qrPanels).forEach(function(key){
+          if (qrPanels[key]) qrPanels[key].classList.toggle('show', radio.value === key && radio.checked);
+        });
+      });
+    });
+  })();
 
   function fileToBase64(file){
     return new Promise(function(resolve, reject){
