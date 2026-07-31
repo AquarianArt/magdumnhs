@@ -139,6 +139,59 @@
   /* ---------- SECTION HEADERS ---------- */
   .section{padding: clamp(52px,8vw,88px) clamp(20px,6vw,56px); max-width:1180px; margin:0 auto;}
   .section-head{max-width:640px; margin-bottom:40px;}
+
+  /* ---------- INFO BAR (Weather + Earthquake) ---------- */
+  .info-bar{
+    background:var(--paper); border-bottom:1px solid var(--line);
+    padding:16px clamp(20px,6vw,56px);
+  }
+  .info-bar-inner{
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns:1fr 1px 1fr; gap:24px; align-items:start;
+  }
+  .info-col{display:flex; flex-direction:column; min-width:0;}
+  .info-divider{width:1px; background:var(--line); align-self:stretch;}
+  .info-disclaimer{font-size:11px; color:#9a9fb3; font-style:italic; line-height:1.4; margin-top:8px;}
+  .info-disclaimer a{color:#8a8fa3; text-decoration:underline;}
+
+  .weather-bar-inner{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .weather-icon{font-size:32px; line-height:1;}
+  .weather-main{display:flex; flex-direction:column;}
+  .weather-temp{font-family:'Fraunces',serif; font-size:20px; font-weight:600; color:var(--royal-deep); line-height:1.1;}
+  .weather-desc{font-size:12.5px; color:#5b5f73;}
+  .weather-divider{width:1px; height:32px; background:var(--line); margin:0 4px;}
+  .weather-location{display:flex; flex-direction:column;}
+  .weather-place{font-size:13px; font-weight:700; color:var(--royal);}
+  .weather-updated{font-size:11.5px; color:#8a8fa3;}
+
+  .quake-header{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .quake-icon{font-size:16px;}
+  .quake-title{font-size:13px; font-weight:700; color:var(--royal);}
+  .quake-list{display:flex; flex-direction:column; gap:6px;}
+  .quake-loading{font-size:12.5px; color:#8a8fa3;}
+  .quake-item{display:flex; align-items:center; gap:10px; font-size:12.5px;}
+  .quake-mag{
+    flex-shrink:0; min-width:38px; text-align:center; padding:2px 6px; border-radius:6px;
+    font-weight:800; font-size:12px; color:#fff;
+  }
+  .quake-mag.sev-low{background:#4c9a5a;}
+  .quake-mag.sev-mod{background:#e0a52c;}
+  .quake-mag.sev-high{background:#e0722c;}
+  .quake-mag.sev-severe{background:#c23a3a;}
+  .quake-details{min-width:0;}
+  .quake-place{color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .quake-meta{color:#8a8fa3; font-size:11.5px;}
+  .quake-item a{text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; width:100%;}
+
+  @media (max-width:800px){
+    .info-bar-inner{grid-template-columns:1fr; gap:18px;}
+    .info-divider{display:none;}
+  }
+  @media (max-width:600px){
+    .weather-bar-inner{gap:12px;}
+    .weather-divider{display:none;}
+    .weather-location{width:100%;}
+  }
   .section-eyebrow{font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--royal); margin-bottom:10px;}
   .section-head h2{font-size:clamp(26px,3.2vw,36px); color:var(--royal-deep);}
   .section-head p{color:#565a6e; margin-top:12px; line-height:1.6; font-size:15px;}
@@ -298,7 +351,7 @@
     <div class="seal"><img src="Assets/Magdum Logo.jpg"></div>
     <div class="brand-text">
       <div class="name">Magdum National High School</div>
-      <div class="School ID">SCHOOL ID 305519</div>
+      <div class="School ID">SCHOOL ID 553319</div>
     </div>
   </div>
   <div class="nav-links">
@@ -344,6 +397,40 @@
     </div>
   </div>
 </header>
+
+<!-- ================= WEATHER + EARTHQUAKE INFO BAR ================= -->
+<div class="info-bar">
+  <div class="info-bar-inner">
+    <div class="info-col" id="weather-bar">
+      <div class="weather-bar-inner">
+        <div class="weather-icon" id="weather-icon">🌤️</div>
+        <div class="weather-main">
+          <div class="weather-temp" id="weather-temp">Loading&hellip;</div>
+          <div class="weather-desc" id="weather-desc">Fetching current conditions</div>
+        </div>
+        <div class="weather-divider"></div>
+        <div class="weather-location">
+          <div class="weather-place">Tagum City, Davao del Norte</div>
+          <div class="weather-updated" id="weather-updated">&nbsp;</div>
+        </div>
+      </div>
+      <div class="info-disclaimer">Weather data for general reference only, via Open&#8209;Meteo &mdash; not an official class-suspension announcement. Please follow official DepEd Tagum City, LGU, or PAGASA advisories for suspensions.</div>
+    </div>
+
+    <div class="info-divider"></div>
+
+    <div class="info-col" id="quake-bar">
+      <div class="quake-header">
+        <span class="quake-icon">🌐</span>
+        <span class="quake-title">Recent Earthquake Activity &mdash; Philippines</span>
+      </div>
+      <div class="quake-list" id="quake-list">
+        <div class="quake-loading">Checking recent seismic activity&hellip;</div>
+      </div>
+      <div class="info-disclaimer">Data via USGS (US Geological Survey) for general awareness only &mdash; not official PHIVOLCS intensity readings. For official Philippine advisories, please refer to <a href="https://www.phivolcs.dost.gov.ph/" target="_blank" rel="noopener">DOST&#8209;PHIVOLCS</a>.</div>
+    </div>
+  </div>
+</div>
 
 <!-- ================= SERVICES ================= -->
 <section class="section" id="services">
@@ -844,6 +931,131 @@
       document.body.style.overflow = '';
     }
   });
+
+  // ---- Live weather (Tagum City, Davao del Norte) via Open-Meteo — free, no API key required ----
+  (function(){
+    const iconEl = document.getElementById('weather-icon');
+    const tempEl = document.getElementById('weather-temp');
+    const descEl = document.getElementById('weather-desc');
+    const updatedEl = document.getElementById('weather-updated');
+    if (!tempEl) return;
+
+    // WMO weather codes, as used by Open-Meteo.
+    const WEATHER_CODES = {
+      0: ['Clear sky', '☀️'], 1: ['Mainly clear', '🌤️'], 2: ['Partly cloudy', '⛅'], 3: ['Overcast', '☁️'],
+      45: ['Foggy', '🌫️'], 48: ['Foggy', '🌫️'],
+      51: ['Light drizzle', '🌦️'], 53: ['Drizzle', '🌦️'], 55: ['Dense drizzle', '🌦️'],
+      56: ['Freezing drizzle', '🌧️'], 57: ['Freezing drizzle', '🌧️'],
+      61: ['Light rain', '🌧️'], 63: ['Rain', '🌧️'], 65: ['Heavy rain', '🌧️'],
+      66: ['Freezing rain', '🌧️'], 67: ['Freezing rain', '🌧️'],
+      71: ['Light snow', '🌨️'], 73: ['Snow', '🌨️'], 75: ['Heavy snow', '🌨️'], 77: ['Snow grains', '🌨️'],
+      80: ['Rain showers', '🌦️'], 81: ['Rain showers', '🌦️'], 82: ['Violent rain showers', '⛈️'],
+      85: ['Snow showers', '🌨️'], 86: ['Snow showers', '🌨️'],
+      95: ['Thunderstorm', '⛈️'], 96: ['Thunderstorm with hail', '⛈️'], 99: ['Thunderstorm with hail', '⛈️']
+    };
+
+    // Tagum City, Davao del Norte coordinates.
+    const LAT = 7.4478, LON = 125.8072;
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
+      '&current_weather=true&timezone=Asia%2FManila';
+
+    function loadWeather(){
+      fetch(url)
+        .then(function(res){ return res.json(); })
+        .then(function(data){
+          const cw = data && data.current_weather;
+          if (!cw) throw new Error('No weather data');
+          const info = WEATHER_CODES[cw.weathercode] || ['Current conditions', '🌡️'];
+          iconEl.textContent = info[1];
+          tempEl.textContent = Math.round(cw.temperature) + '°C';
+          descEl.textContent = info[0] + ' · Wind ' + Math.round(cw.windspeed) + ' km/h';
+          const time = new Date(cw.time);
+          updatedEl.textContent = 'Updated ' + time.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
+        })
+        .catch(function(){
+          iconEl.textContent = '🌡️';
+          tempEl.textContent = 'Weather unavailable';
+          descEl.textContent = 'Please check again later';
+          updatedEl.textContent = '';
+        });
+    }
+
+    loadWeather();
+    setInterval(loadWeather, 15 * 60 * 1000); // refresh every 15 minutes
+  })();
+
+  // ---- Recent earthquake activity (Philippines) via USGS — free, no API key required ----
+  // Note: this is USGS's global catalog filtered to a Philippine bounding box, not an
+  // official PHIVOLCS feed (PHIVOLCS doesn't publish a public API). Magnitudes shown
+  // are USGS moment-magnitude readings, not official PEIS intensity values.
+  (function(){
+    const listEl = document.getElementById('quake-list');
+    if (!listEl) return;
+
+    // Bounding box roughly covering the Philippine archipelago.
+    const MIN_LAT = 4, MAX_LAT = 21, MIN_LON = 116, MAX_LON = 127;
+    const MIN_MAGNITUDE = 2.5;
+    const LOOKBACK_DAYS = 30;
+    const MAX_RESULTS = 5;
+
+    function severityClass(mag){
+      if (mag >= 7) return 'sev-severe';
+      if (mag >= 6) return 'sev-high';
+      if (mag >= 4.5) return 'sev-mod';
+      return 'sev-low';
+    }
+
+    function timeAgo(ms){
+      const diffMin = Math.round((Date.now() - ms) / 60000);
+      if (diffMin < 60) return diffMin + 'm ago';
+      const diffHr = Math.round(diffMin / 60);
+      if (diffHr < 24) return diffHr + 'h ago';
+      return Math.round(diffHr / 24) + 'd ago';
+    }
+
+    function loadQuakes(){
+      const start = new Date(Date.now() - LOOKBACK_DAYS * 24 * 60 * 60 * 1000).toISOString();
+      const url = 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson' +
+        '&starttime=' + start +
+        '&minlatitude=' + MIN_LAT + '&maxlatitude=' + MAX_LAT +
+        '&minlongitude=' + MIN_LON + '&maxlongitude=' + MAX_LON +
+        '&minmagnitude=' + MIN_MAGNITUDE +
+        '&orderby=time&limit=' + MAX_RESULTS;
+
+      fetch(url)
+        .then(function(res){ return res.json(); })
+        .then(function(data){
+          const quakes = (data && data.features) || [];
+          if (quakes.length === 0) {
+            listEl.innerHTML = '<div class="quake-loading">No notable earthquakes (M' + MIN_MAGNITUDE + '+) in the Philippines in the last ' + LOOKBACK_DAYS + ' days.</div>';
+            return;
+          }
+          listEl.innerHTML = quakes.map(function(q){
+            const mag = q.properties.mag;
+            const place = q.properties.place || 'Philippines region';
+            const depth = q.geometry && q.geometry.coordinates ? Math.round(q.geometry.coordinates[2]) : null;
+            const sev = severityClass(mag);
+            const ago = timeAgo(q.properties.time);
+            const detailUrl = q.properties.url || '#';
+            return '<div class="quake-item">' +
+              '<a href="' + detailUrl + '" target="_blank" rel="noopener">' +
+                '<span class="quake-mag ' + sev + '">M' + mag.toFixed(1) + '</span>' +
+                '<span class="quake-details">' +
+                  '<span class="quake-place">' + place.replace(/</g, '&lt;') + '</span><br>' +
+                  '<span class="quake-meta">' + ago + (depth !== null ? ' · Depth ' + depth + 'km' : '') + '</span>' +
+                '</span>' +
+              '</a>' +
+            '</div>';
+          }).join('');
+        })
+        .catch(function(){
+          listEl.innerHTML = '<div class="quake-loading">Earthquake data unavailable right now.</div>';
+        });
+    }
+
+    loadQuakes();
+    setInterval(loadQuakes, 15 * 60 * 1000); // refresh every 15 minutes
+  })();
 
   // Show the matching QR code panel when GCash or PayMaya is selected as the payment method.
   (function(){
