@@ -181,6 +181,7 @@
   .quake-details{min-width:0;}
   .quake-place{color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .quake-meta{color:#8a8fa3; font-size:11.5px;}
+  .quake-epicenter{color:#4d5169; font-size:11.5px; font-style:italic;}
   .quake-item a{text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; width:100%;}
 
   @media (max-width:800px){
@@ -427,7 +428,7 @@
       <div class="quake-list" id="quake-list">
         <div class="quake-loading">Checking recent seismic activity&hellip;</div>
       </div>
-      <div class="info-disclaimer">Data via USGS (US Geological Survey) for general awareness only &mdash; not official PHIVOLCS intensity readings. For official Philippine advisories, please refer to <a href="https://www.phivolcs.dost.gov.ph/" target="_blank" rel="noopener">DOST&#8209;PHIVOLCS</a>.</div>
+      <div class="info-disclaimer">Data via USGS (US Geological Survey); administrative location via OpenStreetMap. For general awareness only &mdash; not official PHIVOLCS intensity readings, and epicenter areas are approximate (barangay-level detail isn't always available, especially offshore). For official Philippine advisories, please refer to <a href="https://www.phivolcs.dost.gov.ph/" target="_blank" rel="noopener">DOST&#8209;PHIVOLCS</a>.</div>
     </div>
   </div>
 </div>
@@ -998,6 +999,10 @@
     const LOOKBACK_DAYS = 30;
     const MAX_RESULTS = 5;
 
+    // Reverse-geocode cache so repeated 15-minute refreshes of the same
+    // event don't re-query Nominatim unnecessarily.
+    const geoCache = {};
+
     function severityClass(mag){
       if (mag >= 7) return 'sev-severe';
       if (mag >= 6) return 'sev-high';
@@ -1011,6 +1016,62 @@
       const diffHr = Math.round(diffMin / 60);
       if (diffHr < 24) return diffHr + 'h ago';
       return Math.round(diffHr / 24) + 'd ago';
+    }
+
+    function sleep(ms){
+      return new Promise(function(resolve){ setTimeout(resolve, ms); });
+    }
+
+    // Builds "Barangay, City, Province, Region" from whatever Nominatim
+    // actually returns — offshore or sparsely-mapped epicenters often won't
+    // resolve every level, especially barangay, so we only show what we have.
+    function formatAdminArea(address){
+      if (!address) return null;
+      const barangay = address.village || address.suburb || address.neighbourhood || null;
+      const city = address.city || address.town || address.municipality || null;
+      const province = address.province || address.county || null;
+      const region = address.region || address.state || null;
+      const parts = [barangay, city, province, region].filter(Boolean);
+      if (parts.length === 0) return null;
+      // De-duplicate consecutive identical values (sometimes city === province in the data).
+      const deduped = parts.filter(function(p, i){ return i === 0 || p !== parts[i - 1]; });
+      return deduped.join(', ');
+    }
+
+    function reverseGeocode(lat, lon){
+      const key = lat.toFixed(3) + ',' + lon.toFixed(3);
+      if (geoCache[key]) return Promise.resolve(geoCache[key]);
+
+      const url = 'https://nominatim.openstreetmap.org/reverse?format=json&zoom=14&addressdetails=1' +
+        '&lat=' + lat + '&lon=' + lon;
+
+      return fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(function(res){ return res.json(); })
+        .then(function(data){
+          const formatted = formatAdminArea(data && data.address);
+          geoCache[key] = formatted;
+          return formatted;
+        })
+        .catch(function(){ return null; });
+    }
+
+    function renderQuakeHtml(q, epicenterText){
+      const mag = q.properties.mag;
+      const place = q.properties.place || 'Philippines region';
+      const depth = q.geometry && q.geometry.coordinates ? Math.round(q.geometry.coordinates[2]) : null;
+      const sev = severityClass(mag);
+      const ago = timeAgo(q.properties.time);
+      const detailUrl = q.properties.url || '#';
+      return '<div class="quake-item">' +
+        '<a href="' + detailUrl + '" target="_blank" rel="noopener">' +
+          '<span class="quake-mag ' + sev + '">M' + mag.toFixed(1) + '</span>' +
+          '<span class="quake-details">' +
+            '<span class="quake-place">' + place.replace(/</g, '&lt;') + '</span><br>' +
+            '<span class="quake-epicenter" id="' + q.id + '-epicenter">' + (epicenterText || 'Locating administrative area&hellip;') + '</span><br>' +
+            '<span class="quake-meta">' + ago + (depth !== null ? ' · Depth ' + depth + 'km' : '') + '</span>' +
+          '</span>' +
+        '</a>' +
+      '</div>';
     }
 
     function loadQuakes(){
@@ -1030,23 +1091,25 @@
             listEl.innerHTML = '<div class="quake-loading">No notable earthquakes (M' + MIN_MAGNITUDE + '+) in the Philippines in the last ' + LOOKBACK_DAYS + ' days.</div>';
             return;
           }
-          listEl.innerHTML = quakes.map(function(q){
-            const mag = q.properties.mag;
-            const place = q.properties.place || 'Philippines region';
-            const depth = q.geometry && q.geometry.coordinates ? Math.round(q.geometry.coordinates[2]) : null;
-            const sev = severityClass(mag);
-            const ago = timeAgo(q.properties.time);
-            const detailUrl = q.properties.url || '#';
-            return '<div class="quake-item">' +
-              '<a href="' + detailUrl + '" target="_blank" rel="noopener">' +
-                '<span class="quake-mag ' + sev + '">M' + mag.toFixed(1) + '</span>' +
-                '<span class="quake-details">' +
-                  '<span class="quake-place">' + place.replace(/</g, '&lt;') + '</span><br>' +
-                  '<span class="quake-meta">' + ago + (depth !== null ? ' · Depth ' + depth + 'km' : '') + '</span>' +
-                '</span>' +
-              '</a>' +
-            '</div>';
-          }).join('');
+
+          // Render immediately with placeholders, then fill in epicenter
+          // details as each reverse-geocode resolves.
+          listEl.innerHTML = quakes.map(function(q){ return renderQuakeHtml(q, null); }).join('');
+
+          // Nominatim's usage policy caps free requests at ~1/second, so we
+          // resolve these one at a time with a short delay rather than all
+          // at once.
+          let chain = Promise.resolve();
+          quakes.forEach(function(q){
+            chain = chain.then(function(){
+              const coords = q.geometry && q.geometry.coordinates;
+              if (!coords) return;
+              return reverseGeocode(coords[1], coords[0]).then(function(area){
+                const el = document.getElementById(q.id + '-epicenter');
+                if (el) el.textContent = area || 'Epicenter area not available (likely offshore or remote)';
+              }).then(function(){ return sleep(1100); });
+            });
+          });
         })
         .catch(function(){
           listEl.innerHTML = '<div class="quake-loading">Earthquake data unavailable right now.</div>';
